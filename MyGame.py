@@ -1,2 +1,7 @@
 print("Hello world")
-print("Hi guys")
+name = str(input("What is your name? "))
+if name.lower() == "dale":
+    print("Hello Master")
+else:
+    print("Hello",name)
+    
