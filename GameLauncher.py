@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class Application(tk.Frame):
+class App(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.pack()
@@ -15,7 +15,12 @@ class Application(tk.Frame):
         #self.quit["bg"]="black"
     def say_hi(self):
         print("hi there, everyone!")
+        
+
 
 root = tk.Tk()
-app = Application(master=root)
-app.mainloop()
+GameLauncher = App(master=root)
+#window setup ----------------------
+GameLauncher.master.title("GameLauncher")
+GameLauncher.master.minsize(600,400)
+GameLauncher.mainloop()
