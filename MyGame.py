@@ -5,4 +5,4 @@ if name.lower() == "dale":
 else:
     print("Hello",name)
     
-#Windows pc test
+#ubuntu 16.10 test
