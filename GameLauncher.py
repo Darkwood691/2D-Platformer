@@ -1,26 +1,19 @@
-import tkinter as tk
+from tkinter import *
 
-class App(tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.pack()
+class Application(Frame):
+    def __init__(self, master):
+        super(Application,self).__init__(master)
+        self.grid()
         self.create_widgets()
 
     def create_widgets(self):
-        self.hi_there = tk.Button(self, text="Hello World\n(click me)", command = self.say_hi)
-        self.hi_there.pack(side="top")
-
-        self.quit = tk.Button(self, text="QUIT", fg="red",bg="yellow", command=root.destroy)
-        self.quit.pack(side="bottom")
-        #self.quit["bg"]="black"
-    def say_hi(self):
-        print("hi there, everyone!")
+        Button(self, text = "Hello", command = self.hello).grid(row=0,column = 0, sticky="nesw")
         
+    def hello(self):
+        print("Hello")
 
-
-root = tk.Tk()
-GameLauncher = App(master=root)
-#window setup ----------------------
-GameLauncher.master.title("GameLauncher")
-GameLauncher.master.minsize(600,400)
-GameLauncher.mainloop()
+root=Tk()
+root.title("Game Launcher")
+root.minsize(600, 400)
+app=Application(root)
+root.mainloop()
