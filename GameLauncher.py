@@ -7,8 +7,8 @@ class Application(Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        Button(self, text = "Hello", command = self.hello).grid(row=0,column = 0, sticky="nesw")
-        
+        Button(self, text = "Hello", command = self.hello).grid(row=0,column = 1, sticky="nesw")
+        Label(self,width=5).grid(row=0,column=0,columnspan=1,sticky="nesw")
     def hello(self):
         print("Hello")
 
