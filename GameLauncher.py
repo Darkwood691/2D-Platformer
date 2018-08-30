@@ -9,17 +9,17 @@ class Application(Frame):
     def create_widgets(self):
         b1=Button(self, text = "Hello", command = self.hello).grid(row=0,column = 1, sticky="nesw")
         l1=Label(self,width=5).grid(row=0,column=0,columnspan=1,sticky="nesw")
-        cb1=Checkbutton(self,text="Fullscreen",variable=fullscreen).grid(row=1,column=1)
+        cb1=Checkbutton(self,text="fullScreen",variable=fullScreen).grid(row=1,column=1)
         b2=Button(self,text="Done",command=self.done).grid(row=2,column=1,sticky="nesw")
         
     def hello(self):
         print("Hello")
     
     def done(self):
-        print(fullscreen.get())
+        print(fullScreen.get())
 
 root=Tk()
-fullscreen=IntVar()
+fullScreen=IntVar()
 root.title("Game Launcher")
 root.minsize(600, 400)
 app=Application(root)
