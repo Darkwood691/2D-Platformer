@@ -20,14 +20,23 @@ resolution = [1280,720]
     
 gameDisplay = pygame.display.set_mode(resolution) 
 pygame.display.set_caption("Game") 
-        
-#gameDisplay.fill(0,0,0)
-pygame.display.update()
-time.sleep(3)
 
 def end():
     pygame.quit()
     quit()
+
+
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            end()
+        if event.type == pygame.KEYDOWN:
+            
+            print(event)
+#gameDisplay.fill(0,0,0)
+    pygame.display.update()
+
 
 
 end()
