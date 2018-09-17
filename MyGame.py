@@ -70,7 +70,13 @@ while True:
             elif hat==(0,-1):
                 #down
                 yChange=speed
-            print(hat)
+            #print(hat)
+
+    #joystick.get_axis(0)
+    #if event.type == pygame.JOYBUTTONDOWN:
+    #        if joystick.get_button(9)==1:
+                
+                
     x+=xChange
     y+=yChange
     #box
