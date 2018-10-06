@@ -54,11 +54,13 @@ class sprite():
     def kill(self):
         del self
 
-player=sprite(20,20,[35,50],"Player",blue)
-enemy1=sprite(400,200,[35,50],"Enemy",black)
-enemy2=sprite(600,200,[35,50],"Enemy",black)
-enemy3=sprite(200,200,[35,50],"Enemy",black)
-enemy4=sprite(100,100,[35,50],"Enemy",black)
+
+size=[int(resolution[0]/24.7),int(resolution[1]/9.36)]
+player=sprite(20,20,[size[0],size[1]],"Player",blue)
+enemy1=sprite(400,200,[size[0],size[1]],"Enemy",black)
+enemy2=sprite(600,200,[size[0],size[1]],"Enemy",black)
+enemy3=sprite(200,200,[size[0],size[1]],"Enemy",black)
+enemy4=sprite(100,100,[size[0],size[1]],"Enemy",black)
 
 map1=sprite(0,(resolution[1]-10),[resolution[0],10],"Map",black)
 
@@ -183,12 +185,13 @@ while True:
         #print(colision)
         #sprites[colision[1]].colour=red
         col=int(colision[1])
-        if sprite.registry[col].sType!="Map":
-            sprite.registry[col].kill()
-            del sprite.registry[(col)]
-        else:
+        if sprite.registry[col].sType=="Map" or sprite.registry[col].sType=="Player":
             player.yChange=0
             player.y=sprite.registry[col].y
+        else:
+            sprite.registry[col].kill()
+            del sprite.registry[(col)]
+            
     """
     else:
         for n in range(len(sprites)-1):
