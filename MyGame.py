@@ -2,6 +2,14 @@
 import pygame
 #import time
     
+#settings file read ------------------------------
+config = open("Settings.txt","r")
+settings=config.read().split("z")
+config.close()
+res=settings[0].split("x")
+resolution = []
+for nums in res:
+    resolution.append(int(nums))
 
 
 #pygame.font.init()
@@ -14,32 +22,104 @@ red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
 grey = (80,80,80)
-    
 #variables --------------------------------------------------------
-resolution = [600,400]
-gameDisplay = pygame.display.set_mode(resolution) 
+
+
 pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
 
 #movement
-speed=5
+speed=6
 xChange=0
 yChange=0
-x=0
-y=0
+
+gameDisplay = pygame.display.set_mode(resolution) 
+
+class sprite():
+    registry=[]
+    
+    def __init__(self,x,y,size,sType,colour):
+        self.registry.append(self)
+        self.x=x
+        self.y=y
+        self.size=size
+        self.sType=sType
+        self.colour=colour
+        if self.sType!="Map":  
+            self.xChange=0
+            self.yChange=0
+            self.timeLeave=0
+        
+    def kill(self):
+        del self
+
+player=sprite(20,20,[35,50],"Player",blue)
+enemy1=sprite(400,200,[35,50],"Enemy",black)
+enemy2=sprite(600,200,[35,50],"Enemy",black)
+enemy3=sprite(200,200,[35,50],"Enemy",black)
+enemy4=sprite(100,100,[35,50],"Enemy",black)
+
+map1=sprite(0,(resolution[1]-10),[resolution[0],10],"Map",black)
 
 
 def end():
     pygame.quit()
     pygame.joystick.quit()
     quit()
+    
+
+#collision with sprites --------------------------------------------------------
+def spriteColide():
+    for n in range(len(sprite.registry)):
+        for m in range(len(sprite.registry)):
+            if n!=m:
+                if sprite.registry[n].x+sprite.registry[n].size[0] >= sprite.registry[m].x and sprite.registry[n].x<=sprite.registry[m].x+sprite.registry[m].size[0] and \
+                sprite.registry[n].y+sprite.registry[n].size[1]>=sprite.registry[m].y and sprite.registry[n].y<=sprite.registry[m].y+sprite.registry[m].size[1]:
+                    return (n,m)
 
 
 while True:
+    def up():
+        player.yChange=-speed
+        return
+    def down():
+        player.yChange=speed
+        return
+    def left():
+        player.xChange=-speed
+        return
+    def right():
+        player.xChange=speed
+        return
+        
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             end()
+        if event.type==pygame.KEYDOWN:
+            #print(event.key)
+            if event.key==119 or event.key==32:#w
+                up()
+            if event.key==115:#s
+                down()
+            if event.key==97:#a
+                left()
+            if event.key==100:#d
+                right()
+        if event.type==pygame.KEYUP:
+            if event.key==119 or event.key==32:#w
+                if player.yChange==-speed:
+                    player.yChange=0
+            if event.key==115:#s
+                if player.yChange==speed:
+                    player.yChange=0
+            if event.key==97:#a
+                if player.xChange==-speed:
+                    player.xChange=0
+            if event.key==100:#d
+                if player.xChange==speed:
+                    player.xChange=0
+                
         if event.type==pygame.JOYAXISMOTION:
             print("Joy",event)
         if event.type==pygame.JOYBUTTONDOWN:
@@ -70,20 +150,66 @@ while True:
             elif hat==(0,-1):
                 #down
                 yChange=speed
+            elif hat==(0,0):
+                yChange=0
+                xChange=0
             #print(hat)
 
     #joystick.get_axis(0)
     #if event.type == pygame.JOYBUTTONDOWN:
     #        if joystick.get_button(9)==1:
-                
-                
-    x+=xChange
-    y+=yChange
+    
+    """
+    #gravity--------------------------------------------------
+    if player.timeLeave==0:
+        if player.y<resolution[1]-player.size[1]:
+            player.timeLeave=pygame.time.get_ticks()/1000
+            print(player.timeLeave)
+    elif player.y==resolution[1]-player.size[1]:
+        player.timeLeave=0
+    
+    
+    time=pygame.time.get_ticks()/1000
+    if player.yChange==0:
+        timeStart=pygame.time.get_ticks()/1000
+        player.yChange=player.yChange+1
+    elif player.yChange>0:
+        player.yChange=player.yChange+128*(time-timeStart)**1.8
+    """
+    
+    colision=spriteColide()
+    
+    if colision!=None:
+        #print(colision)
+        #sprites[colision[1]].colour=red
+        col=int(colision[1])
+        if sprite.registry[col].sType!="Map":
+            sprite.registry[col].kill()
+            del sprite.registry[(col)]
+        else:
+            player.yChange=0
+            player.y=sprite.registry[col].y
+    """
+    else:
+        for n in range(len(sprites)-1):
+            sprites[n+1].colour=black
+    """
+    """
+    #detect collision with the bottom of the window
+    if player.y>=resolution[1]-player.size[1]and player.yChange>0:
+        player.yChange=0
+        player.y=resolution[1]-player.size[1]
+       """ 
+    
+    player.x+=player.xChange
+    player.y+=player.yChange
+    
+    
     #box
     gameDisplay.fill(white)
-    pygame.draw.rect(gameDisplay,black,(x,y,20,20))
-    xChange=0
-    yChange=0
+    for n in range(len(sprite.registry)):
+        pygame.draw.rect(gameDisplay,sprite.registry[n].colour,(sprite.registry[n].x,sprite.registry[n].y,sprite.registry[n].size[0],sprite.registry[n].size[1]))
+        
     clock.tick(60)
 
     pygame.display.update()
