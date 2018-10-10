@@ -56,13 +56,16 @@ class sprite():
 
 
 size=[int(resolution[0]/24.7),int(resolution[1]/9.36)]
-player=sprite(20,20,[size[0],size[1]],"Player",blue)
-enemy1=sprite(400,200,[size[0],size[1]],"Enemy",black)
-enemy2=sprite(600,200,[size[0],size[1]],"Enemy",black)
-enemy3=sprite(200,200,[size[0],size[1]],"Enemy",black)
-enemy4=sprite(100,100,[size[0],size[1]],"Enemy",black)
 
-map1=sprite(0,(resolution[1]-10),[resolution[0],10],"Map",black)
+player=sprite(20,20,[size[0],size[1]],"Player",blue)
+enemy1=sprite(400,200,[size[0],size[1]],"Enemy",red)
+enemy2=sprite(600,200,[size[0],size[1]],"Enemy",red)
+enemy3=sprite(300,200,[size[0],size[1]],"Enemy",red)
+enemy4=sprite(100,100,[size[0],size[1]],"Enemy",red)
+map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/48.6],"Map",black)
+map2=sprite(400,100,[100,20],"Map",black)
+
+
 
 
 def end():
@@ -78,6 +81,7 @@ def spriteColide():
             if n!=m:
                 if sprite.registry[n].x+sprite.registry[n].size[0] >= sprite.registry[m].x and sprite.registry[n].x<=sprite.registry[m].x+sprite.registry[m].size[0] and \
                 sprite.registry[n].y+sprite.registry[n].size[1]>=sprite.registry[m].y and sprite.registry[n].y<=sprite.registry[m].y+sprite.registry[m].size[1]:
+                    print("#",n,m)
                     return (n,m)
 
 
@@ -184,13 +188,25 @@ while True:
     if colision!=None:
         #print(colision)
         #sprites[colision[1]].colour=red
-        col=int(colision[1])
-        if sprite.registry[col].sType=="Map" or sprite.registry[col].sType=="Player":
-            player.yChange=0
-            player.y=sprite.registry[col].y
-        else:
-            sprite.registry[col].kill()
-            del sprite.registry[(col)]
+        spriteA=sprite.registry[int(colision[0])]
+        spriteB=sprite.registry[int(colision[1])]
+        """
+        if spriteA.sType=="Map":
+            if spriteB.yChange>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
+                spriteB.yChange=0
+                spriteB.y=spriteA.y-(spriteB.size[1])
+            #elif sprite.registry[colB].yChange<0:
+            #    sprite.regisrty[]"""
+        if spriteB.sType=="Map":
+            if spriteA.yChange>=0 and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.y+spriteA.size[1])<=(spriteB.y+spriteB.size[1]):
+                spriteA.yChange=0
+                spriteA.y=spriteB.y-(spriteA.size[1])
+            elif spriteA.yChange<=0 and spriteA.y>=spriteB.y+spriteB.size[1] and spriteA.y<=spriteB.y:
+                spriteA.yChange=0
+                spriteA.y=spriteB.y+(spriteB.size[1])
+        #else:
+            #sprite.registry[colB].kill()
+            #del sprite.registry[(colB)]
             
     """
     else:
