@@ -11,7 +11,6 @@ resolution = []
 for nums in res:
     resolution.append(int(nums))
 
-
 #pygame.font.init()
 pygame.init()
     
@@ -34,7 +33,16 @@ speed=6
 xChange=0
 yChange=0
 
-gameDisplay = pygame.display.set_mode(resolution) 
+if settings[2]=="1":
+    print("suc")
+    resolutionX=[0,0]
+else:
+    resolutionX=resolution
+    print("fail")
+
+gameDisplay = pygame.display.set_mode(resolutionX)
+
+
 
 class sprite():
     registry=[]
@@ -58,13 +66,13 @@ class sprite():
 size=[int(resolution[0]/24.7),int(resolution[1]/9.36)]
 
 player=sprite(20,20,[size[0],size[1]],"Player",blue)
-enemy1=sprite(400,200,[size[0],size[1]],"Enemy",red)
+enemy1=sprite(320,200,[size[0],size[1]],"Enemy",red)
 enemy2=sprite(600,200,[size[0],size[1]],"Enemy",red)
 enemy3=sprite(300,200,[size[0],size[1]],"Enemy",red)
 enemy4=sprite(100,100,[size[0],size[1]],"Enemy",red)
 map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/48.6],"Map",black)
 map2=sprite(400,100,[100,20],"Map",black)
-
+map3=sprite(200,260,[200,150],"Map",black)
 
 
 
@@ -76,14 +84,16 @@ def end():
 
 #collision with sprites --------------------------------------------------------
 def spriteColide():
+    cols=[]
     for n in range(len(sprite.registry)):
         for m in range(len(sprite.registry)):
             if n!=m:
                 if sprite.registry[n].x+sprite.registry[n].size[0] >= sprite.registry[m].x and sprite.registry[n].x<=sprite.registry[m].x+sprite.registry[m].size[0] and \
                 sprite.registry[n].y+sprite.registry[n].size[1]>=sprite.registry[m].y and sprite.registry[n].y<=sprite.registry[m].y+sprite.registry[m].size[1]:
-                    print("#",n,m)
-                    return (n,m)
-
+                    col=n,m
+                    cols.append(col)
+    #print(cols)
+    return cols
 
 while True:
     def up():
@@ -98,8 +108,21 @@ while True:
     def right():
         player.xChange=speed
         return
+    
+    
+    keys=pygame.key.get_pressed()   
+    if keys[119]==True or keys[32]==True:
+        up()
+    if keys[115]==True:
+        down()
+    if keys[97]==True:
+        left()
+    if keys[100]==True:
+        right()
+        
         
     for event in pygame.event.get():
+        keys=pygame.key.get_pressed()
         if event.type==pygame.QUIT:
             end()
         if event.type==pygame.KEYDOWN:
@@ -183,30 +206,49 @@ while True:
         player.yChange=player.yChange+128*(time-timeStart)**1.8
     """
     
-    colision=spriteColide()
+    colisions=spriteColide()
     
-    if colision!=None:
-        #print(colision)
-        #sprites[colision[1]].colour=red
-        spriteA=sprite.registry[int(colision[0])]
-        spriteB=sprite.registry[int(colision[1])]
-        """
-        if spriteA.sType=="Map":
-            if spriteB.yChange>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
-                spriteB.yChange=0
-                spriteB.y=spriteA.y-(spriteB.size[1])
-            #elif sprite.registry[colB].yChange<0:
-            #    sprite.regisrty[]"""
-        if spriteB.sType=="Map":
-            if spriteA.yChange>=0 and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.y+spriteA.size[1])<=(spriteB.y+spriteB.size[1]):
-                spriteA.yChange=0
-                spriteA.y=spriteB.y-(spriteA.size[1])
-            elif spriteA.yChange<=0 and spriteA.y>=spriteB.y+spriteB.size[1] and spriteA.y<=spriteB.y:
-                spriteA.yChange=0
-                spriteA.y=spriteB.y+(spriteB.size[1])
-        #else:
-            #sprite.registry[colB].kill()
-            #del sprite.registry[(colB)]
+    
+    if colisions!=[]:
+        for n in range(len(colisions)):
+            colision=colisions[n]
+        
+            #print(colision)
+            #sprites[colision[1]].colour=red
+            spriteA=sprite.registry[int(colision[0])]
+            spriteB=sprite.registry[int(colision[1])]
+            """
+            if spriteA.sType=="Map":
+                if spriteB.yChange>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
+                    spriteB.yChange=0
+                    spriteB.y=spriteA.y-(spriteB.size[1])
+                #elif sprite.registry[colB].yChange<0:
+                #    sprite.regisrty[]"""
+            
+            if spriteB.sType=="Map" and spriteA.sType!="Map":
+                if spriteA.yChange>=0 and spriteA.y<spriteB.y and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.y+spriteA.size[1])<=(spriteB.y+spriteB.size[1]):
+                    print("ya")
+                    spriteA.timeLeave=0
+                    spriteA.yChange=0
+                    spriteA.y=spriteB.y-(spriteA.size[1])
+                if spriteA.yChange<=0 and spriteA.y>spriteB.y and spriteA.y+spriteA.size[1]>spriteB.y+spriteB.size[1] and spriteA.y>=(spriteB.y) and spriteA.y<=(spriteB.y+spriteB.size[1]):
+                    print("yb")
+                    spriteA.yChange=0
+                    spriteA.y=spriteB.y+(spriteB.size[1])
+                    
+                if spriteA.xChange>=0 and spriteA.x<spriteB.x and (spriteA.x+spriteA.size[0])>=spriteB.x and (spriteA.x+spriteA.size[0])<=(spriteB.x+spriteB.size[0]):
+                    print("xa")
+                    spriteA.xChange=0
+                    spriteA.x=spriteB.x-(spriteA.size[0])
+                if spriteA.xChange<=0 and spriteA.x+spriteA.size[0]>spriteB.x+spriteB.size[0] and spriteA.x>=(spriteB.x) and spriteA.x<=(spriteB.x+spriteB.size[0]):
+                    print("xb")
+                    spriteA.xChange=0
+                    spriteA.x=spriteB.x+(spriteB.size[0])    
+                    
+                
+            #else:
+                #sprite.registry[colB].kill()
+                #del sprite.registry[(colB)]
             
     """
     else:
@@ -214,11 +256,11 @@ while True:
             sprites[n+1].colour=black
     """
     """
-    #detect collision with the bottom of the window
-    if player.y>=resolution[1]-player.size[1]and player.yChange>0:
-        player.yChange=0
-        player.y=resolution[1]-player.size[1]
-       """ 
+    for n in range(len(sprite.registry)):
+        if sprite.sType!="Map":
+            sprite[n].yChange=sprite[n].yChange+9.81*
+            
+    """        #v=u+at
     
     player.x+=player.xChange
     player.y+=player.yChange
