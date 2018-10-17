@@ -6,10 +6,18 @@ import pygame
 config = open("Settings.txt","r")
 settings=config.read().split("z")
 config.close()
+
 res=settings[0].split("x")
 resolution = []
 for nums in res:
     resolution.append(int(nums))
+
+
+gameDisplay = pygame.display.set_mode(resolution)
+
+if settings[2]=="1":
+    pygame.display.toggle_fullscreen()
+    
 
 #pygame.font.init()
 pygame.init()
@@ -33,14 +41,10 @@ speed=6
 xChange=0
 yChange=0
 
-if settings[2]=="1":
-    print("suc")
-    resolutionX=[0,0]
-else:
-    resolutionX=resolution
-    print("fail")
 
-gameDisplay = pygame.display.set_mode(resolutionX)
+
+
+
 
 
 
@@ -70,7 +74,7 @@ enemy1=sprite(320,200,[size[0],size[1]],"Enemy",red)
 enemy2=sprite(600,200,[size[0],size[1]],"Enemy",red)
 enemy3=sprite(300,200,[size[0],size[1]],"Enemy",red)
 enemy4=sprite(100,100,[size[0],size[1]],"Enemy",red)
-map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/48.6],"Map",black)
+map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/40],"Map",black)
 map2=sprite(400,100,[100,20],"Map",black)
 map3=sprite(200,260,[200,150],"Map",black)
 
@@ -127,6 +131,8 @@ while True:
             end()
         if event.type==pygame.KEYDOWN:
             #print(event.key)
+            if event.key==292:
+                pygame.display.toggle_fullscreen()
             if event.key==119 or event.key==32:#w
                 up()
             if event.key==115:#s
