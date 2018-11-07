@@ -12,8 +12,14 @@ resolution = []
 for nums in res:
     resolution.append(int(nums))
 
+#detect actual monitor size
+display = pygame.display.set_mode((0,0))
+infoObject = pygame.display.Info()
+monitorResolution=[infoObject.current_w, infoObject.current_h]
+#print(monitorResolution)
 
 gameDisplay = pygame.display.set_mode(resolution)
+
 
 if settings[2]=="1":
     pygame.display.toggle_fullscreen()
@@ -38,8 +44,8 @@ clock = pygame.time.Clock()
 
 #movement
 speed=6
-xChange=0
-yChange=0
+vx=0
+vy=0
 
 
 
@@ -59,8 +65,8 @@ class sprite():
         self.sType=sType
         self.colour=colour
         if self.sType!="Map":  
-            self.xChange=0
-            self.yChange=0
+            self.vx=0
+            self.vy=0
             self.timeLeave=0
         
     def kill(self):
@@ -70,9 +76,9 @@ class sprite():
 size=[int(resolution[0]/24.7),int(resolution[1]/9.36)]
 
 player=sprite(20,20,[size[0],size[1]],"Player",blue)
-enemy1=sprite(320,200,[size[0],size[1]],"Enemy",red)
-enemy2=sprite(600,200,[size[0],size[1]],"Enemy",red)
-enemy3=sprite(300,200,[size[0],size[1]],"Enemy",red)
+enemy1=sprite(320,180,[size[0],size[1]],"Enemy",red)
+enemy2=sprite(600,180,[size[0],size[1]],"Enemy",red)
+enemy3=sprite(200,180,[size[0],size[1]],"Enemy",red)
 enemy4=sprite(100,100,[size[0],size[1]],"Enemy",red)
 map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/40],"Map",black)
 map2=sprite(400,100,[100,20],"Map",black)
@@ -86,7 +92,7 @@ def end():
     quit()
     
 
-#collision with sprites --------------------------------------------------------
+#collision detection --------------------------------------------------------
 def spriteColide():
     cols=[]
     for n in range(len(sprite.registry)):
@@ -101,16 +107,16 @@ def spriteColide():
 
 while True:
     def up():
-        player.yChange=-speed
+        player.vy=-speed
         return
     def down():
-        player.yChange=speed
+        player.vy=speed
         return
     def left():
-        player.xChange=-speed
+        player.vx=-speed
         return
     def right():
-        player.xChange=speed
+        player.vx=speed
         return
     
     
@@ -143,17 +149,17 @@ while True:
                 right()
         if event.type==pygame.KEYUP:
             if event.key==119 or event.key==32:#w
-                if player.yChange==-speed:
-                    player.yChange=0
+                if player.vy==-speed:
+                    player.vy=0
             if event.key==115:#s
-                if player.yChange==speed:
-                    player.yChange=0
+                if player.vy==speed:
+                    player.vy=0
             if event.key==97:#a
-                if player.xChange==-speed:
-                    player.xChange=0
+                if player.vx==-speed:
+                    player.vx=0
             if event.key==100:#d
-                if player.xChange==speed:
-                    player.xChange=0
+                if player.vx==speed:
+                    player.vx=0
                 
         if event.type==pygame.JOYAXISMOTION:
             print("Joy",event)
@@ -175,19 +181,19 @@ while True:
             hat=joystick.get_hat(i)
             if hat==(1,0):
                 #right
-                xChange=speed
+                vx=speed
             elif hat==(-1,0):
                 #left
-                xChange=-speed
+                vx=-speed
             elif hat==(0,1):
                 #up
-                yChange=-speed
+                vy=-speed
             elif hat==(0,-1):
                 #down
-                yChange=speed
+                vy=speed
             elif hat==(0,0):
-                yChange=0
-                xChange=0
+                vy=0
+                vx=0
             #print(hat)
 
     #joystick.get_axis(0)
@@ -205,12 +211,15 @@ while True:
     
     
     time=pygame.time.get_ticks()/1000
-    if player.yChange==0:
+    if player.vy==0:
         timeStart=pygame.time.get_ticks()/1000
-        player.yChange=player.yChange+1
-    elif player.yChange>0:
-        player.yChange=player.yChange+128*(time-timeStart)**1.8
+        player.vy=player.vy+1
+    elif player.vy>0:
+        player.vy=player.vy+128*(time-timeStart)**1.8
     """
+    
+    player.x+=player.vx
+    player.y+=player.vy
     
     colisions=spriteColide()
     
@@ -225,33 +234,80 @@ while True:
             spriteB=sprite.registry[int(colision[1])]
             """
             if spriteA.sType=="Map":
-                if spriteB.yChange>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
-                    spriteB.yChange=0
+                if spriteB.vy>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
+                    spriteB.vy=0
                     spriteB.y=spriteA.y-(spriteB.size[1])
-                #elif sprite.registry[colB].yChange<0:
+                #elif sprite.registry[colB].vy<0:
                 #    sprite.regisrty[]"""
-            
-            if spriteB.sType=="Map" and spriteA.sType!="Map":
-                if spriteA.yChange>=0 and spriteA.y<spriteB.y and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.y+spriteA.size[1])<=(spriteB.y+spriteB.size[1]):
-                    print("ya")
-                    spriteA.timeLeave=0
-                    spriteA.yChange=0
-                    spriteA.y=spriteB.y-(spriteA.size[1])
-                if spriteA.yChange<=0 and spriteA.y>spriteB.y and spriteA.y+spriteA.size[1]>spriteB.y+spriteB.size[1] and spriteA.y>=(spriteB.y) and spriteA.y<=(spriteB.y+spriteB.size[1]):
-                    print("yb")
-                    spriteA.yChange=0
-                    spriteA.y=spriteB.y+(spriteB.size[1])
-                    
-                if spriteA.xChange>=0 and spriteA.x<spriteB.x and (spriteA.x+spriteA.size[0])>=spriteB.x and (spriteA.x+spriteA.size[0])<=(spriteB.x+spriteB.size[0]):
-                    print("xa")
-                    spriteA.xChange=0
-                    spriteA.x=spriteB.x-(spriteA.size[0])
-                if spriteA.xChange<=0 and spriteA.x+spriteA.size[0]>spriteB.x+spriteB.size[0] and spriteA.x>=(spriteB.x) and spriteA.x<=(spriteB.x+spriteB.size[0]):
-                    print("xb")
-                    spriteA.xChange=0
-                    spriteA.x=spriteB.x+(spriteB.size[0])    
-                    
                 
+            if spriteB.sType=="Map" and spriteA.sType!="Map":
+                sides=""
+                if spriteA.vy>=0 and spriteA.y<spriteB.y and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.x+spriteA.size[0]>spriteB.x and spriteA.x<spriteB.x+spriteB.size[0]) :
+                    sides=sides+"u"
+                if spriteA.vy<=0 and spriteA.y+spriteA.size[1]>spriteB.y+spriteB.size[1] and spriteA.y<=(spriteB.y+spriteB.size[1]) and (spriteA.x+spriteA.size[0]>spriteB.x and spriteA.x<spriteB.x+spriteB.size[0]) :
+                    sides=sides+"d"
+                if spriteA.vx>=0 and spriteA.x<spriteB.x and (spriteA.x+spriteA.size[0])>=spriteB.x and spriteA.y+spriteA.size[1]>spriteB.y and spriteA.y<spriteB.y+spriteB.size[1]:
+                    sides=sides+"l"
+                if spriteA.vx<=0 and spriteA.x+spriteA.size[0]>spriteB.x+spriteB.size[0] and spriteA.x<=spriteB.x+spriteB.size[0] and spriteA.y+spriteA.size[1]>spriteB.y and spriteA.y<spriteA.y+spriteA.size[1]:
+                    sides=sides+"r"
+                
+                if sides=="u":
+                    spriteA.timeLeave=0#current time not 0
+                    spriteA.vy=0
+                    spriteA.y=spriteB.y-(spriteA.size[1])
+                elif sides=="d":
+                    spriteA.vy=0
+                    spriteA.y=spriteB.y+(spriteB.size[1])
+                elif sides=="l":
+                    spriteA.vx=0
+                    spriteA.x=spriteB.x-(spriteA.size[0])
+                elif sides=="r":
+                    spriteA.vx=0
+                    spriteA.x=spriteB.x+(spriteB.size[0])
+                elif sides=="dr":
+                    if (spriteB.x+spriteB.size[0]-spriteA.x)>(spriteB.y+spriteB.size[1]-spriteA.y):
+                        spriteA.vy=0
+                        spriteA.y=spriteB.y+spriteB.size[1]
+                    else:
+                        spriteA.vx=0
+                        spriteA.x=spriteB.x+spriteB.size[0]
+                elif sides=="dl":
+                    if ((spriteA.x+spriteA.size[0])-spriteB.x)>(spriteB.y+spriteB.size[1]-spriteA.y):
+                        spriteA.vy=0
+                        spriteA.y=spriteB.y+spriteB.size[1]
+                    else:
+                        spriteA.vx=0
+                        spriteA.x=spriteB.x-spriteA.size[0]
+                elif sides=="ul":
+                    if (spriteA.x+spriteA.size[0]-spriteB.x)>(spriteA.y+spriteA.size[1]-spriteB.y):
+                        spriteA.vy=0
+                        spriteA.y=spriteB.y-spriteA.size[1]
+                    else:
+                        spriteA.vx=0
+                        spriteA.x=spriteB.x-spriteA.size[0]                        
+                elif sides=="ur":
+                    if (spriteB.x+spriteB.size[0]-spriteA.x)>(spriteA.y+spriteA.size[1]-spriteB.y):
+                        spriteA.vy=0
+                        spriteA.y=spriteB.y-spriteA.size[1]
+                    else:
+                        spriteA.vx=0
+                        spriteA.x=spriteB.x+spriteB.size[0]
+                        
+                elif sides=="udl":
+                    spriteA.vx=0
+                    spriteA.x=spriteB.x-spriteA.size[0]
+                elif sides=="udr":
+                    spriteA.vx=0
+                    spriteA.x=spriteB.x+spriteB.size[0]
+                elif sides=="ulr":
+                    spriteA.vy=0
+                    spriteA.y=spriteB.y-spriteA.size[1]
+                elif sides=="dlr":
+                    spriteA.vy=0
+                    spriteA.y=spriteB.y+spriteB.size[1]
+                    #if the two are equal then it will pick the seccond option
+                else:    
+                    print(sides)
             #else:
                 #sprite.registry[colB].kill()
                 #del sprite.registry[(colB)]
@@ -264,12 +320,9 @@ while True:
     """
     for n in range(len(sprite.registry)):
         if sprite.sType!="Map":
-            sprite[n].yChange=sprite[n].yChange+9.81*
+            sprite[n].vy=sprite[n].vy+9.81*
             
     """        #v=u+at
-    
-    player.x+=player.xChange
-    player.y+=player.yChange
     
     
     #box
