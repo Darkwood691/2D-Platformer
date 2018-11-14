@@ -293,6 +293,7 @@ while True:
                         spriteA.vx=0
                         spriteA.x=spriteB.x+spriteB.size[0]
                         
+                        #if the two are equal then it will pick the second option
                 elif sides=="udl":
                     spriteA.vx=0
                     spriteA.x=spriteB.x-spriteA.size[0]
@@ -305,7 +306,7 @@ while True:
                 elif sides=="dlr":
                     spriteA.vy=0
                     spriteA.y=spriteB.y+spriteB.size[1]
-                    #if the two are equal then it will pick the seccond option
+                    
                 else:    
                     print(sides)
             #else:
