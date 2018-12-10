@@ -49,11 +49,6 @@ vy=0
 
 
 
-
-
-
-
-
 class sprite():
     registry=[]
     
@@ -106,6 +101,8 @@ def spriteColide():
     return cols
 
 while True:
+    fps=clock.get_fps()
+    
     def up():
         player.vy=-speed
         return
@@ -120,21 +117,34 @@ while True:
         return
     
     
-    keys=pygame.key.get_pressed()   
+    keys=pygame.key.get_pressed()   #checks the keys that are currently held down
     if keys[119]==True or keys[32]==True:
         up()
+    else:
+        if player.vy==-speed:
+            player.vy=0
     if keys[115]==True:
         down()
+    else:
+        if player.vy==speed:
+            player.vy=0
     if keys[97]==True:
         left()
+    else:
+        if player.vx==-speed:
+            player.vx=0
     if keys[100]==True:
         right()
-        
+    else:
+        if player.vx==speed:
+            player.vx=0
+     
         
     for event in pygame.event.get():
         keys=pygame.key.get_pressed()
         if event.type==pygame.QUIT:
             end()
+        """
         if event.type==pygame.KEYDOWN:
             #print(event.key)
             if event.key==292:
@@ -160,7 +170,7 @@ while True:
             if event.key==100:#d
                 if player.vx==speed:
                     player.vx=0
-                
+        """    
         if event.type==pygame.JOYAXISMOTION:
             print("Joy",event)
         if event.type==pygame.JOYBUTTONDOWN:
@@ -232,14 +242,7 @@ while True:
             #sprites[colision[1]].colour=red
             spriteA=sprite.registry[int(colision[0])]
             spriteB=sprite.registry[int(colision[1])]
-            """
-            if spriteA.sType=="Map":
-                if spriteB.vy>0 and (spriteB.y+spriteB.size[1])==spriteA.y:
-                    spriteB.vy=0
-                    spriteB.y=spriteA.y-(spriteB.size[1])
-                #elif sprite.registry[colB].vy<0:
-                #    sprite.regisrty[]"""
-                
+
             if spriteB.sType=="Map" and spriteA.sType!="Map":
                 sides=""
                 if spriteA.vy>=0 and spriteA.y<spriteB.y and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.x+spriteA.size[0]>spriteB.x and spriteA.x<spriteB.x+spriteB.size[0]) :
@@ -252,7 +255,7 @@ while True:
                     sides=sides+"r"
                 
                 if sides=="u":
-                    spriteA.timeLeave=0#current time not 0
+                    spriteA.timeLeave=pygame.time.get_ticks() #time it last touched the ground
                     spriteA.vy=0
                     spriteA.y=spriteB.y-(spriteA.size[1])
                 elif sides=="d":
