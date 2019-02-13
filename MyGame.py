@@ -1,6 +1,5 @@
 #initialisation ---------------------------------------------------
 import pygame
-#import time
     
 #settings file read ------------------------------
 config = open("Settings.txt","r")
