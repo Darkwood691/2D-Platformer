@@ -62,14 +62,18 @@ class sprite():
         self.size = size
         self.sType = sType
         self.colour = colour
-        if self.sType != "Map":
+        
+        if self.sType == "EnemyM":
+            self.vx = -speed
+            self.vy = speed
+        else:
             self.vx = 0
             self.vy = 0
-            self.timeLeave = 0
-            self.onGround = False
-            if self.sType == "Player":
-                self.health = 100
-                self.iTime = 0
+        self.timeLeave = 0
+        self.onGround = False
+        if self.sType == "Player":
+            self.health = 100
+            self.iTime = 0
                     
     def up(self, jumpTics):
         if player.onGround == True:
@@ -104,21 +108,28 @@ class sprite():
         del self
 
 
-#sprites --------------------------------------------------------------------------------
+#sprites ---------------------------------------------------------------------------------------------------------
 
 # spriteName = sprite(x, y, [width, height], type, colour)
 
 player = sprite(3, 9, [1, 1.6], "Player", blue)
 map1 = sprite(-100, ((resolution[1] - resolution[1] /48)/scale), [1000, resolution[1] / 40], "Map", black)
-map2 = sprite(6, 9, [1.5, 0.5], "Map", black)
-map3 = sprite(2, 7, [2,1.5], "Map", black)
-map4 = sprite(11,3, [1,8], "Map", black)
-map5 = sprite(-15,-5,[1,20], "Map",black)
+map2 = sprite(-15,-5,[1,20], "Map",black)
+
+map3 = sprite(6, 9, [1.5, 0.5], "Map", black)
+map4 = sprite(2, 7, [2,1.5], "Map", black)
+map5 = sprite(11,3, [1,8], "Map", black)
+
+
 spike1 = sprite(11.5,13.5,[19.3,0.6],"EnemyS",red)
 map6 = sprite(15,3, [1,8], "Map", black)
 map7 = sprite(25,3, [1,8], "Map", black)
 map8 = sprite(30,3, [1,11], "Map", black)
-map9 = sprite(35,8, [7,1], "Map", black)
+
+map9 = sprite(35,7.5, [7,1], "Map", black)
+map10 = sprite(35,-10, [1,17.5],"Map",black)
+enemy1 = sprite(35,10, [1,1.6], "EnemyM",red)
+map11 = sprite(45,9, [1,5],"Map",black)
 
 
 def gameEnd(score):
@@ -225,9 +236,17 @@ while gameOver == False:
     #        if joystick.get_button(9)==1:
 
 
-    player.x += player.vx
-    player.y += player.vy
+    #Move Sprites-------------------------------------------------------------
+    
+    for n in range(len(sprite.registry)):
+        sprite.registry[n].x += sprite.registry[n].vx
+        sprite.registry[n].y += sprite.registry[n].vy
 
+    #print(enemy1.x,enemy1.y)
+
+
+    #Collision Handling
+        
     colisions = spriteColide()
 
     if colisions != []:
@@ -267,13 +286,19 @@ while gameOver == False:
                     spriteA.vy = 0
                     spriteA.y = spriteB.y + (spriteB.size[1])
                 elif sides == "l":
-                    #spriteA.onGround = True #
-                    spriteA.vx = 0
-                    spriteA.x = spriteB.x - (spriteA.size[0])
+                    if spriteA.sType == "EnemyM":
+                        spriteA.vx = spriteA.vx*-1
+                    else:
+                        #spriteA.onGround = True #
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x - (spriteA.size[0])
                 elif sides == "r":
-                    #spriteA.onGround = True #
-                    spriteA.vx = 0
-                    spriteA.x = spriteB.x + (spriteB.size[0])
+                    if spriteA.sType == "EnemyM":
+                        spriteA.vx = spriteA.vx*-1
+                    else:
+                        #spriteA.onGround = True #
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x + (spriteB.size[0])
                 elif sides == "dr":
                     if (spriteB.x + spriteB.size[0] - spriteA.x) > (spriteB.y + spriteB.size[1] - spriteA.y):
                         spriteA.vy = 0
@@ -320,23 +345,30 @@ while gameOver == False:
                     spriteA.y = spriteB.y + spriteB.size[1]
                 else:
                     break
-                    #print(sides)
+                    print(sides)
+
+            #Enemy
             elif spriteA.sType == "Player" and (spriteB.sType == "EnemyM" or spriteB.sType == "EnemyS"):
                 spriteA.damage()
-                
 
+            elif spriteA.sType == "EnemyM":
+                if spriteB.sType == "Player":
+                    spriteB.damage()
                 
         if colFlag == 0:
             player.onGround = False
     else:
         player.onGround = False
     #print(player.onGround)
+
+    
     #gravity--------------------------------------------------
                     
     if False == player.onGround:
         player.vy = player.vy + 1.5*((pygame.time.get_ticks()-player.timeLeave)/1000) # v = u + a*t
         #print((pygame.time.get_ticks()-player.timeLeave)/1000) #log
 
+    
   
     """
     else:
