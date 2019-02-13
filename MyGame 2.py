@@ -39,6 +39,7 @@ clock = pygame.time.Clock()
 
 # variables --------------------------------------------------------
 
+jumpTics = 0
 #size = [int(resolution[0] / 24.7), int(resolution[1] / 9.36)]
 scale = int(resolution[0] / 24.7)
 speed = scale/5
@@ -64,7 +65,7 @@ class sprite():
             self.timeLeave = 0
             self.onGround = False
 
-    def up(self):
+    def up(self, jumpTics):
         if player.onGround == True:
             self.timeLeave = pygame.time.get_ticks()  # current time
             self.vy = - jumpHeight
@@ -122,12 +123,15 @@ while True:
 
     keys = pygame.key.get_pressed()
     if keys[119] or keys[32]:
-        player.up()
+        jumpTics += 1
+        player.up(jumpTics)
+    else:
+        jumpTics = 0
     if keys[97]:
         player.left()
     if keys[100]:
         player.right()
-
+        
     for event in pygame.event.get():
         keys = pygame.key.get_pressed()
         if event.type == pygame.QUIT:
@@ -137,7 +141,7 @@ while True:
             if event.key == 292:
                 pygame.display.toggle_fullscreen()
             if event.key == 119 or event.key == 32:  # w
-                player.up()
+                player.up(jumpTics)
             if event.key == 97:  # a
                 player.left()
             if event.key == 100:  # d
