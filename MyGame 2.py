@@ -1,5 +1,6 @@
 # initialisation ---------------------------------------------------
 import pygame
+import time
 
 # settings file read ------------------------------
 config = open("Settings.txt", "r")
@@ -45,6 +46,8 @@ scale = int(resolution[0] / 24.7)
 speed = scale/5
 jumpHeight = 1.15*speed
 print(speed, jumpHeight)
+global gameOver
+gameOver = False
 
 
 class sprite():
@@ -64,7 +67,10 @@ class sprite():
             self.vy = 0
             self.timeLeave = 0
             self.onGround = False
-
+            if self.sType == "Player":
+                self.health = 100
+                self.iTime = 0
+                    
     def up(self, jumpTics):
         if player.onGround == True:
             self.timeLeave = pygame.time.get_ticks()  # current time
@@ -80,23 +86,42 @@ class sprite():
         self.vx = speed
         return
 
+    def damage(self):
+        if self.sType != "Player":
+            print("Type Error")
+        else:
+            if self.health > 10:
+                if pygame.time.get_ticks() > self.iTime:
+                    self.health -= 10
+                    self.iTime = pygame.time.get_ticks()+150
+            else:
+                self.health = 0
+                global gameOver
+                gameOver = True
+
+                
     def kill(self):
         del self
 
 
 
-# sprite = sprite(x, y, [width, height], type, colour)
+# spriteName = sprite(x, y, [width, height], type, colour)
 
-player = sprite(3, 3, [1, 1.6], "Player", blue)
-enemy1 = sprite(3.2, 1.8, [1, 1.6], "Enemy", red)
-enemy2 = sprite(6, 1.8, [1, 1.6], "Enemy", red)
-enemy3 = sprite(2, 1.8, [1, 1.6], "Enemy", red)
-enemy4 = sprite(1, 1, [1, 1.6], "Enemy", red)
-map1 = sprite(0, ((resolution[1] - resolution[1] /48)/scale), [resolution[0], resolution[1] / 40], "Map", black)
+player = sprite(3, 9, [1, 1.6], "Player", blue)
+map1 = sprite(-100, ((resolution[1] - resolution[1] /48)/scale), [1000, resolution[1] / 40], "Map", black)
 map2 = sprite(6, 9, [1.5, 0.5], "Map", black)
 map3 = sprite(2, 7, [2,1.5], "Map", black)
-map4 = sprite(11,1, [1,12], "Map", black)
+map4 = sprite(11,3, [1,8], "Map", black)
+map5 = sprite(-15,-5,[1,20], "Map",black)
+spike1 = sprite(11.5,13.5,[20,0.6],"EnemyS",red)
+map6 = sprite(15,3, [1,11], "Map", black)
 
+
+def gameEnd(score):
+    print("GAME OVER")
+    print("SCORE: "+str(score))
+    time.sleep(0.5)
+    end()
 
 def end():
     pygame.quit()
@@ -119,8 +144,8 @@ def spriteColide():
     # print(cols)
     return cols
 
-while True:
-
+while gameOver == False:
+    
     keys = pygame.key.get_pressed()
     if keys[119] or keys[32]:
         jumpTics += 1
@@ -290,7 +315,13 @@ while True:
                     spriteA.vy = 0
                     spriteA.y = spriteB.y + spriteB.size[1]
                 else:
-                    print(sides)
+                    break
+                    #print(sides)
+            elif spriteA.sType == "Player" and (spriteB.sType == "EnemyM" or spriteB.sType == "EnemyS"):
+                spriteA.damage()
+                
+
+                
         if colFlag == 0:
             player.onGround = False
     else:
@@ -323,6 +354,11 @@ while True:
     #camY = player.y - (resolution[1]/2)
     
     gameDisplay.fill(white)
+    #health bar
+    pygame.draw.rect(gameDisplay, black, (21.5*scale,0.4*scale,3*scale,0.6*scale))
+    if player.health != 0:
+        pygame.draw.rect(gameDisplay, red, (21.6*scale,0.5*scale,2.8*scale*player.health/100,0.4*scale))
+    
     for n in range(len(sprite.registry)):
         pygame.draw.rect(gameDisplay, sprite.registry[n].colour, (sprite.registry[n].x-camX, sprite.registry[n].y, sprite.registry[n].size[0], sprite.registry[n].size[1]))
 
@@ -330,4 +366,4 @@ while True:
     
     pygame.display.update()
 
-end()
+gameEnd(player.x-resolution[0]/3)
