@@ -40,12 +40,11 @@ clock = pygame.time.Clock()
 
 # variables --------------------------------------------------------
 
-jumpTics = 0
 #size = [int(resolution[0] / 24.7), int(resolution[1] / 9.36)]
 scale = int(resolution[0] / 24.7)
 speed = scale/5
 jumpHeight = 1.15*speed
-print(speed, jumpHeight)
+#print(speed, jumpHeight)
 global gameOver
 gameOver = False
 
@@ -75,7 +74,7 @@ class sprite():
             self.health = 100
             self.iTime = 0
                     
-    def up(self, jumpTics):
+    def up(self):
         if player.onGround == True:
             self.timeLeave = pygame.time.get_ticks()  # current time
             self.vy = - jumpHeight
@@ -164,10 +163,7 @@ while gameOver == False:
     
     keys = pygame.key.get_pressed()
     if keys[119] or keys[32]:
-        jumpTics += 1
-        player.up(jumpTics)
-    else:
-        jumpTics = 0
+        player.up()
     if keys[97]:
         player.left()
     if keys[100]:
@@ -182,7 +178,7 @@ while gameOver == False:
             if event.key == 292:
                 pygame.display.toggle_fullscreen()
             if event.key == 119 or event.key == 32:  # w
-                player.up(jumpTics)
+                player.up()
             if event.key == 97:  # a
                 player.left()
             if event.key == 100:  # d
@@ -202,35 +198,31 @@ while gameOver == False:
             print("Joy", event)
         if event.type == pygame.JOYBUTTONDOWN:
             print("Joy button pressed", event)
+            if joystick.get_button(2)==1:
+                player.up()
 
     # joystick-----------------------------------
 
     joystick_count = pygame.joystick.get_count()
-    # print("count",joystick_count)
 
-    for i in range(joystick_count):
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
+    if joystick_count > 0:    
+        for i in range(joystick_count):
+            joystick = pygame.joystick.Joystick(i)
+            joystick.init()
 
-        hats = joystick.get_numhats()
-        for i in range(hats):
-            hat = joystick.get_hat(i)
-            if hat == (1, 0):
-                # right
-                vx = speed
-            elif hat == (-1, 0):
-                # left
-                vx = -speed
-            elif hat == (0, 1):
-                # up
-                vy = -speed
-            elif hat == (0, -1):
-                # down
-                vy = speed
-            elif hat == (0, 0):
-                vy = 0
-                vx = 0
-            # print(hat)
+            hats = joystick.get_numhats()
+            for i in range(hats):
+                hat = joystick.get_hat(i)
+                if hat == (1, 0):# right
+                    player.right()
+                elif hat == (-1, 0):# left
+                    player.left()
+                elif hat == (0, 1):# up
+                    player.up()
+                #elif hat == (0, -1):# down
+                elif hat == (0, 0):
+                    player.vx = 0
+                #print(hat)
 
     # joystick.get_axis(0)
     # if event.type == pygame.JOYBUTTONDOWN:
@@ -277,6 +269,8 @@ while gameOver == False:
                     1] > spriteB.y and spriteA.y < spriteA.y + spriteA.size[1]:
                     sides = sides + "r"
 
+                #if spriteA.sType == "Player":  #test data
+                #    print(sides)
                 if sides == "u":                    
                     spriteA.timeLeave = pygame.time.get_ticks()  # current time
                     spriteA.onGround = True
@@ -315,7 +309,7 @@ while gameOver == False:
                         spriteA.vx = 0
                         spriteA.x = spriteB.x - spriteA.size[0]
                 elif sides == "ul":
-                    #spriteA.onGround = True #
+                    spriteA.onGround = True #
                     if (spriteA.x + spriteA.size[0] - spriteB.x) > (spriteA.y + spriteA.size[1] - spriteB.y):
                         spriteA.vy = 0
                         spriteA.y = spriteB.y - spriteA.size[1]
@@ -323,7 +317,7 @@ while gameOver == False:
                         spriteA.vx = 0
                         spriteA.x = spriteB.x - spriteA.size[0]
                 elif sides == "ur":
-                    #spriteA.onGround = True #
+                    spriteA.onGround = True #
                     if (spriteB.x + spriteB.size[0] - spriteA.x) > (spriteA.y + spriteA.size[1] - spriteB.y):
                         spriteA.vy = 0
                         spriteA.y = spriteB.y - spriteA.size[1]
