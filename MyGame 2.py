@@ -91,13 +91,14 @@ class sprite():
         return
 
     def damage(self):
+        damageHP = 20
         if self.sType != "Player":
             print("Type Error")
         else:
-            if self.health > 10:
+            if self.health > damageHP:
                 if pygame.time.get_ticks() > self.iTime:
-                    self.health -= 10
-                    self.iTime = pygame.time.get_ticks()+150
+                    self.health -= damageHP
+                    self.iTime = pygame.time.get_ticks()+250
             else:
                 self.health = 0
                 global gameOver
@@ -370,24 +371,15 @@ while gameOver == False:
 
     
   
-    """
-    else:
-        for n in range(len(sprites)-1):
-            sprites[n+1].colour=black
 
-    for n in range(len(sprite.registry)):
-        if sprite.sType!="Map":
-            sprite[n].vy=sprite[n].vy+9.81*
-            
-    """  # v=u+at
 
-    
     #Display
-    
-    
-    
+        
     camX = player.x - (resolution[0]/2)
-    #camY = player.y - (resolution[1]/2)
+    if player.y > resolution[1]/3:
+        camY = 0
+    else:
+        camY = player.y - (resolution[1]/3)
     
     gameDisplay.fill(white)
     #health bar
@@ -396,7 +388,7 @@ while gameOver == False:
         pygame.draw.rect(gameDisplay, red, (21.6*scale,0.5*scale,2.8*scale*player.health/100,0.4*scale))
     
     for n in range(len(sprite.registry)):
-        pygame.draw.rect(gameDisplay, sprite.registry[n].colour, (sprite.registry[n].x-camX, sprite.registry[n].y, sprite.registry[n].size[0], sprite.registry[n].size[1]))
+        pygame.draw.rect(gameDisplay, sprite.registry[n].colour, (sprite.registry[n].x-camX, sprite.registry[n].y-camY, sprite.registry[n].size[0], sprite.registry[n].size[1]))
 
     clock.tick(60)
     
