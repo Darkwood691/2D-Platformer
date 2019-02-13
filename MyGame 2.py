@@ -104,6 +104,7 @@ class sprite():
         del self
 
 
+#sprites --------------------------------------------------------------------------------
 
 # spriteName = sprite(x, y, [width, height], type, colour)
 
@@ -113,8 +114,11 @@ map2 = sprite(6, 9, [1.5, 0.5], "Map", black)
 map3 = sprite(2, 7, [2,1.5], "Map", black)
 map4 = sprite(11,3, [1,8], "Map", black)
 map5 = sprite(-15,-5,[1,20], "Map",black)
-spike1 = sprite(11.5,13.5,[20,0.6],"EnemyS",red)
-map6 = sprite(15,3, [1,11], "Map", black)
+spike1 = sprite(11.5,13.5,[19.3,0.6],"EnemyS",red)
+map6 = sprite(15,3, [1,8], "Map", black)
+map7 = sprite(25,3, [1,8], "Map", black)
+map8 = sprite(30,3, [1,11], "Map", black)
+map9 = sprite(35,8, [7,1], "Map", black)
 
 
 def gameEnd(score):
