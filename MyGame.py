@@ -1,341 +1,391 @@
-#initialisation ---------------------------------------------------
+# initialisation ---------------------------------------------------
 import pygame
-    
-#settings file read ------------------------------
-config = open("Settings.txt","r")
-settings=config.read().split("z")
+import time
+
+# settings file read ------------------------------
+config = open("Settings.txt", "r")
+settings = config.read().split("z")
 config.close()
 
-res=settings[0].split("x")
+res = settings[0].split("x")
 resolution = []
 for nums in res:
     resolution.append(int(nums))
 
-#detect actual monitor size
-display = pygame.display.set_mode((0,0))
+# detect actual monitor size
+display = pygame.display.set_mode((0, 0))
 infoObject = pygame.display.Info()
-monitorResolution=[infoObject.current_w, infoObject.current_h]
-#print(monitorResolution)
+monitorResolution = [infoObject.current_w, infoObject.current_h]
+# print(monitorResolution)
 
-gameDisplay = pygame.display.set_mode(resolution)
+gameDisplay = pygame.display.set_mode(resolution,16)
 
-
-if settings[2]=="1":
+if settings[2] == "1":
     pygame.display.toggle_fullscreen()
-    
 
-#pygame.font.init()
+# pygame.font.init()
 pygame.init()
-    
-#colour definitions -----------------------------------------------
-white = (240,240,240)
-black = (0,0,0)
-red = (255,0,0)
-green = (0,255,0)
-blue = (0,0,255)
-grey = (80,80,80)
-#variables --------------------------------------------------------
 
+# colour definitions -----------------------------------------------
+white = (240, 240, 240)
+black = (0, 0, 0)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+grey = (80, 80, 80)
 
+# initilization ------------------------------------------------------
 pygame.display.set_caption("Game")
-
 clock = pygame.time.Clock()
 
-#movement
-speed=6
-vx=0
-vy=0
+# variables --------------------------------------------------------
 
+#size = [int(resolution[0] / 24.7), int(resolution[1] / 9.36)]
+scale = int(resolution[0] / 24.7)
+speed = scale/5
+jumpHeight = 1.15*speed
+#print(speed, jumpHeight)
+global gameOver
+gameOver = False
 
 
 class sprite():
-    registry=[]
-    
-    def __init__(self,x,y,size,sType,colour):
+    registry = []
+
+    def __init__(self, x, y, size, sType, colour):
+        for n in range(2):
+            size[n]=float(size[n])*scale          
         self.registry.append(self)
-        self.x=x
-        self.y=y
-        self.size=size
-        self.sType=sType
-        self.colour=colour
-        if self.sType!="Map":  
-            self.vx=0
-            self.vy=0
-            self.timeLeave=0
+        self.x = x*scale
+        self.y = y*scale
+        self.size = size
+        self.sType = sType
+        self.colour = colour
         
+        if self.sType == "EnemyM":
+            self.vx = -speed
+            self.vy = speed
+        else:
+            self.vx = 0
+            self.vy = 0
+        self.timeLeave = 0
+        self.onGround = False
+        if self.sType == "Player":
+            self.health = 100
+            self.iTime = 0
+                    
+    def up(self):
+        if player.onGround == True:
+            self.timeLeave = pygame.time.get_ticks()  # current time
+            self.vy = - jumpHeight
+        self.onGround = False
+        return
+
+    def left(self):
+        self.vx = -speed
+        return
+
+    def right(self):
+        self.vx = speed
+        return
+
+    def damage(self):
+        damageHP = 20
+        if self.sType != "Player":
+            print("Type Error")
+        else:
+            if self.health > damageHP:
+                if pygame.time.get_ticks() > self.iTime:
+                    self.health -= damageHP
+                    self.iTime = pygame.time.get_ticks()+250
+            else:
+                self.health = 0
+                global gameOver
+                gameOver = True
+
+                
     def kill(self):
         del self
 
 
-size=[int(resolution[0]/24.7),int(resolution[1]/9.36)]
+#sprites ---------------------------------------------------------------------------------------------------------
 
-player=sprite(20,20,[size[0],size[1]],"Player",blue)
-enemy1=sprite(320,180,[size[0],size[1]],"Enemy",red)
-enemy2=sprite(600,180,[size[0],size[1]],"Enemy",red)
-enemy3=sprite(200,180,[size[0],size[1]],"Enemy",red)
-enemy4=sprite(100,100,[size[0],size[1]],"Enemy",red)
-map1=sprite(0,(resolution[1]-resolution[1]/48.6),[resolution[0],resolution[1]/40],"Map",black)
-map2=sprite(400,100,[100,20],"Map",black)
-map3=sprite(200,260,[200,150],"Map",black)
+# spriteName = sprite(x, y, [width, height], type, colour)
+
+player = sprite(3, 9, [1, 1.6], "Player", blue)
+map1 = sprite(-100, ((resolution[1] - resolution[1] /48)/scale), [1000, resolution[1] / 40], "Map", black)
+map2 = sprite(-15,-5,[1,20], "Map",black)
+
+map3 = sprite(6, 9, [1.5, 0.5], "Map", black)
+map4 = sprite(2, 7, [2,1.5], "Map", black)
+map5 = sprite(11,3, [1,8], "Map", black)
 
 
+spike1 = sprite(11.5,13.5,[19.3,0.6],"EnemyS",red)
+map6 = sprite(15,3, [1,8], "Map", black)
+map7 = sprite(25,3, [1,8], "Map", black)
+map8 = sprite(30,3, [1,11], "Map", black)
+
+map9 = sprite(35,7.5, [7,1], "Map", black)
+map10 = sprite(35,-10, [1,17.5],"Map",black)
+enemy1 = sprite(35,10, [1,1.6], "EnemyM",red)
+map11 = sprite(45,9, [1,5],"Map",black)
+
+
+def gameEnd(score):
+    print("GAME OVER")
+    print("SCORE: "+str(score))
+    time.sleep(0.5)
+    end()
 
 def end():
     pygame.quit()
     pygame.joystick.quit()
     quit()
-    
 
-#collision detection --------------------------------------------------------
+
+# collision detection --------------------------------------------------------
 def spriteColide():
-    cols=[]
+    cols = []
     for n in range(len(sprite.registry)):
         for m in range(len(sprite.registry)):
-            if n!=m:
-                if sprite.registry[n].x+sprite.registry[n].size[0] >= sprite.registry[m].x and sprite.registry[n].x<=sprite.registry[m].x+sprite.registry[m].size[0] and \
-                sprite.registry[n].y+sprite.registry[n].size[1]>=sprite.registry[m].y and sprite.registry[n].y<=sprite.registry[m].y+sprite.registry[m].size[1]:
-                    col=n,m
+            if n != m:
+                if sprite.registry[n].x + sprite.registry[n].size[0] >= sprite.registry[m].x and \
+                   sprite.registry[n].x <= sprite.registry[m].x + sprite.registry[m].size[0] and \
+                   sprite.registry[n].y + sprite.registry[n].size[1] >= sprite.registry[m].y and \
+                   sprite.registry[n].y <= sprite.registry[m].y + sprite.registry[m].size[1]:
+                    col = n, m
                     cols.append(col)
-    #print(cols)
+    # print(cols)
     return cols
 
-while True:
-    fps=clock.get_fps()
+while gameOver == False:
     
-    def up():
-        player.vy=-speed
-        return
-    def down():
-        player.vy=speed
-        return
-    def left():
-        player.vx=-speed
-        return
-    def right():
-        player.vx=speed
-        return
-    
-    
-    keys=pygame.key.get_pressed()   #checks the keys that are currently held down
-    if keys[119]==True or keys[32]==True:
-        up()
-    else:
-        if player.vy==-speed:
-            player.vy=0
-    if keys[115]==True:
-        down()
-    else:
-        if player.vy==speed:
-            player.vy=0
-    if keys[97]==True:
-        left()
-    else:
-        if player.vx==-speed:
-            player.vx=0
-    if keys[100]==True:
-        right()
-    else:
-        if player.vx==speed:
-            player.vx=0
-     
+    keys = pygame.key.get_pressed()
+    if keys[119] or keys[32]:
+        player.up()
+    if keys[97]:
+        player.left()
+    if keys[100]:
+        player.right()
         
     for event in pygame.event.get():
-        keys=pygame.key.get_pressed()
-        if event.type==pygame.QUIT:
+        keys = pygame.key.get_pressed()
+        if event.type == pygame.QUIT:
             end()
-        """
-        if event.type==pygame.KEYDOWN:
-            #print(event.key)
-            if event.key==292:
+        if event.type == pygame.KEYDOWN:
+            # print(event.key)
+            if event.key == 292:
                 pygame.display.toggle_fullscreen()
-            if event.key==119 or event.key==32:#w
-                up()
-            if event.key==115:#s
-                down()
-            if event.key==97:#a
-                left()
-            if event.key==100:#d
-                right()
-        if event.type==pygame.KEYUP:
-            if event.key==119 or event.key==32:#w
-                if player.vy==-speed:
-                    player.vy=0
-            if event.key==115:#s
-                if player.vy==speed:
-                    player.vy=0
-            if event.key==97:#a
-                if player.vx==-speed:
-                    player.vx=0
-            if event.key==100:#d
-                if player.vx==speed:
-                    player.vx=0
-        """    
-        if event.type==pygame.JOYAXISMOTION:
-            print("Joy",event)
-        if event.type==pygame.JOYBUTTONDOWN:
-            print("Joy button pressed",event)
+            if event.key == 119 or event.key == 32:  # w
+                player.up()
+            if event.key == 97:  # a
+                player.left()
+            if event.key == 100:  # d
+                player.right()
+        if event.type == pygame.KEYUP:
+            if event.key == 119 or event.key == 32:  # w
+                if player.vy == -speed:
+                    player.vy = 0
+            if event.key == 97:  # a
+                if player.vx == -speed:
+                    player.vx = 0
+            if event.key == 100:  # d
+                if player.vx == speed:
+                    player.vx = 0
 
+        if event.type == pygame.JOYAXISMOTION:
+            print("Joy", event)
+        if event.type == pygame.JOYBUTTONDOWN:
+            print("Joy button pressed", event)
+            if joystick.get_button(2)==1:
+                player.up()
 
-    #joystick-----------------------------------
-            
-    joystick_count = pygame.joystick.get_count()  
-    #print("count",joystick_count)
-    
-    for i in range(joystick_count):
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
+    # joystick-----------------------------------
 
-        hats = joystick.get_numhats()
-        for i in range(hats):
-            hat=joystick.get_hat(i)
-            if hat==(1,0):
-                #right
-                vx=speed
-            elif hat==(-1,0):
-                #left
-                vx=-speed
-            elif hat==(0,1):
-                #up
-                vy=-speed
-            elif hat==(0,-1):
-                #down
-                vy=speed
-            elif hat==(0,0):
-                vy=0
-                vx=0
-            #print(hat)
+    joystick_count = pygame.joystick.get_count()
 
-    #joystick.get_axis(0)
-    #if event.type == pygame.JOYBUTTONDOWN:
+    if joystick_count > 0:    
+        for i in range(joystick_count):
+            joystick = pygame.joystick.Joystick(i)
+            joystick.init()
+
+            hats = joystick.get_numhats()
+            for i in range(hats):
+                hat = joystick.get_hat(i)
+                if hat == (1, 0):# right
+                    player.right()
+                elif hat == (-1, 0):# left
+                    player.left()
+                elif hat == (0, 1):# up
+                    player.up()
+                #elif hat == (0, -1):# down
+                elif hat == (0, 0):
+                    player.vx = 0
+                #print(hat)
+
+    # joystick.get_axis(0)
+    # if event.type == pygame.JOYBUTTONDOWN:
     #        if joystick.get_button(9)==1:
+
+
+    #Move Sprites-------------------------------------------------------------
     
-    """
-    #gravity--------------------------------------------------
-    if player.timeLeave==0:
-        if player.y<resolution[1]-player.size[1]:
-            player.timeLeave=pygame.time.get_ticks()/1000
-            print(player.timeLeave)
-    elif player.y==resolution[1]-player.size[1]:
-        player.timeLeave=0
-    
-    
-    time=pygame.time.get_ticks()/1000
-    if player.vy==0:
-        timeStart=pygame.time.get_ticks()/1000
-        player.vy=player.vy+1
-    elif player.vy>0:
-        player.vy=player.vy+128*(time-timeStart)**1.8
-    """
-    
-    player.x+=player.vx
-    player.y+=player.vy
-    
-    colisions=spriteColide()
-    
-    
-    if colisions!=[]:
+    for n in range(len(sprite.registry)):
+        sprite.registry[n].x += sprite.registry[n].vx
+        sprite.registry[n].y += sprite.registry[n].vy
+
+    #print(enemy1.x,enemy1.y)
+
+
+    #Collision Handling
+        
+    colisions = spriteColide()
+
+    if colisions != []:
+        colFlag = 0
         for n in range(len(colisions)):
-            colision=colisions[n]
-        
-            #print(colision)
-            #sprites[colision[1]].colour=red
-            spriteA=sprite.registry[int(colision[0])]
-            spriteB=sprite.registry[int(colision[1])]
+            colision = colisions[n]
+            spriteA = sprite.registry[int(colision[0])]
+            spriteB = sprite.registry[int(colision[1])]
+            
+            if spriteB.sType == "Map" and spriteA.sType != "Map":
+                if spriteA.sType == "Player":
+                    colFlag += 1
+                sides = ""
+                if spriteA.vy >= 0 and spriteA.y < spriteB.y and (spriteA.y + spriteA.size[1]) >= spriteB.y and (
+                        spriteA.x + spriteA.size[0] > spriteB.x and spriteA.x < spriteB.x + spriteB.size[0]):
+                    sides = sides + "u"
+                if spriteA.vy <= 0 and spriteA.y + spriteA.size[1] > spriteB.y + spriteB.size[1] and spriteA.y <= (
+                        spriteB.y + spriteB.size[1]) and (
+                        spriteA.x + spriteA.size[0] > spriteB.x and spriteA.x < spriteB.x + spriteB.size[0]):
+                    sides = sides + "d"
+                if spriteA.vx >= 0 and spriteA.x < spriteB.x and (
+                        spriteA.x + spriteA.size[0]) >= spriteB.x and spriteA.y + spriteA.size[
+                    1] > spriteB.y and spriteA.y < spriteB.y + spriteB.size[1]:
+                    sides = sides + "l"
+                if spriteA.vx <= 0 and spriteA.x + spriteA.size[0] > spriteB.x + spriteB.size[
+                    0] and spriteA.x <= spriteB.x + spriteB.size[0] and spriteA.y + spriteA.size[
+                    1] > spriteB.y and spriteA.y < spriteA.y + spriteA.size[1]:
+                    sides = sides + "r"
 
-            if spriteB.sType=="Map" and spriteA.sType!="Map":
-                sides=""
-                if spriteA.vy>=0 and spriteA.y<spriteB.y and (spriteA.y+spriteA.size[1])>=spriteB.y and (spriteA.x+spriteA.size[0]>spriteB.x and spriteA.x<spriteB.x+spriteB.size[0]) :
-                    sides=sides+"u"
-                if spriteA.vy<=0 and spriteA.y+spriteA.size[1]>spriteB.y+spriteB.size[1] and spriteA.y<=(spriteB.y+spriteB.size[1]) and (spriteA.x+spriteA.size[0]>spriteB.x and spriteA.x<spriteB.x+spriteB.size[0]) :
-                    sides=sides+"d"
-                if spriteA.vx>=0 and spriteA.x<spriteB.x and (spriteA.x+spriteA.size[0])>=spriteB.x and spriteA.y+spriteA.size[1]>spriteB.y and spriteA.y<spriteB.y+spriteB.size[1]:
-                    sides=sides+"l"
-                if spriteA.vx<=0 and spriteA.x+spriteA.size[0]>spriteB.x+spriteB.size[0] and spriteA.x<=spriteB.x+spriteB.size[0] and spriteA.y+spriteA.size[1]>spriteB.y and spriteA.y<spriteA.y+spriteA.size[1]:
-                    sides=sides+"r"
-                
-                if sides=="u":
-                    spriteA.timeLeave=pygame.time.get_ticks() #time it last touched the ground
-                    spriteA.vy=0
-                    spriteA.y=spriteB.y-(spriteA.size[1])
-                elif sides=="d":
-                    spriteA.vy=0
-                    spriteA.y=spriteB.y+(spriteB.size[1])
-                elif sides=="l":
-                    spriteA.vx=0
-                    spriteA.x=spriteB.x-(spriteA.size[0])
-                elif sides=="r":
-                    spriteA.vx=0
-                    spriteA.x=spriteB.x+(spriteB.size[0])
-                elif sides=="dr":
-                    if (spriteB.x+spriteB.size[0]-spriteA.x)>(spriteB.y+spriteB.size[1]-spriteA.y):
-                        spriteA.vy=0
-                        spriteA.y=spriteB.y+spriteB.size[1]
+                #if spriteA.sType == "Player":  #test data
+                #    print(sides)
+                if sides == "u":                    
+                    spriteA.timeLeave = pygame.time.get_ticks()  # current time
+                    spriteA.onGround = True
+                    #print(pygame.time.get_ticks())
+                    spriteA.vy = 0
+                    spriteA.y = spriteB.y - (spriteA.size[1])
+                elif sides == "d":
+                    spriteA.vy = 0
+                    spriteA.y = spriteB.y + (spriteB.size[1])
+                elif sides == "l":
+                    if spriteA.sType == "EnemyM":
+                        spriteA.vx = spriteA.vx*-1
                     else:
-                        spriteA.vx=0
-                        spriteA.x=spriteB.x+spriteB.size[0]
-                elif sides=="dl":
-                    if ((spriteA.x+spriteA.size[0])-spriteB.x)>(spriteB.y+spriteB.size[1]-spriteA.y):
-                        spriteA.vy=0
-                        spriteA.y=spriteB.y+spriteB.size[1]
+                        #spriteA.onGround = True #
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x - (spriteA.size[0])
+                elif sides == "r":
+                    if spriteA.sType == "EnemyM":
+                        spriteA.vx = spriteA.vx*-1
                     else:
-                        spriteA.vx=0
-                        spriteA.x=spriteB.x-spriteA.size[0]
-                elif sides=="ul":
-                    if (spriteA.x+spriteA.size[0]-spriteB.x)>(spriteA.y+spriteA.size[1]-spriteB.y):
-                        spriteA.vy=0
-                        spriteA.y=spriteB.y-spriteA.size[1]
+                        #spriteA.onGround = True #
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x + (spriteB.size[0])
+                elif sides == "dr":
+                    if (spriteB.x + spriteB.size[0] - spriteA.x) > (spriteB.y + spriteB.size[1] - spriteA.y):
+                        spriteA.vy = 0
+                        spriteA.y = spriteB.y + spriteB.size[1]
                     else:
-                        spriteA.vx=0
-                        spriteA.x=spriteB.x-spriteA.size[0]                        
-                elif sides=="ur":
-                    if (spriteB.x+spriteB.size[0]-spriteA.x)>(spriteA.y+spriteA.size[1]-spriteB.y):
-                        spriteA.vy=0
-                        spriteA.y=spriteB.y-spriteA.size[1]
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x + spriteB.size[0]
+                elif sides == "dl":
+                    if ((spriteA.x + spriteA.size[0]) - spriteB.x) > (spriteB.y + spriteB.size[1] - spriteA.y):
+                        spriteA.vy = 0
+                        spriteA.y = spriteB.y + spriteB.size[1]
                     else:
-                        spriteA.vx=0
-                        spriteA.x=spriteB.x+spriteB.size[0]
-                        
-                        #if the two are equal then it will pick the second option
-                elif sides=="udl":
-                    spriteA.vx=0
-                    spriteA.x=spriteB.x-spriteA.size[0]
-                elif sides=="udr":
-                    spriteA.vx=0
-                    spriteA.x=spriteB.x+spriteB.size[0]
-                elif sides=="ulr":
-                    spriteA.vy=0
-                    spriteA.y=spriteB.y-spriteA.size[1]
-                elif sides=="dlr":
-                    spriteA.vy=0
-                    spriteA.y=spriteB.y+spriteB.size[1]
-                    
-                else:    
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x - spriteA.size[0]
+                elif sides == "ul":
+                    spriteA.onGround = True #
+                    if (spriteA.x + spriteA.size[0] - spriteB.x) > (spriteA.y + spriteA.size[1] - spriteB.y):
+                        spriteA.vy = 0
+                        spriteA.y = spriteB.y - spriteA.size[1]
+                    else:
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x - spriteA.size[0]
+                elif sides == "ur":
+                    spriteA.onGround = True #
+                    if (spriteB.x + spriteB.size[0] - spriteA.x) > (spriteA.y + spriteA.size[1] - spriteB.y):
+                        spriteA.vy = 0
+                        spriteA.y = spriteB.y - spriteA.size[1]
+                    else:
+                        spriteA.vx = 0
+                        spriteA.x = spriteB.x + spriteB.size[0]
+
+                        # if the two are equal then it will pick the second option
+                elif sides == "udl":
+                    spriteA.vx = 0
+                    spriteA.x = spriteB.x - spriteA.size[0]
+                elif sides == "udr":
+                    spriteA.vx = 0
+                    spriteA.x = spriteB.x + spriteB.size[0]
+                elif sides == "ulr":
+                    spriteA.vy = 0
+                    spriteA.y = spriteB.y - spriteA.size[1]
+                elif sides == "dlr":
+                    spriteA.vy = 0
+                    spriteA.y = spriteB.y + spriteB.size[1]
+                else:
+                    break
                     print(sides)
-            #else:
-                #sprite.registry[colB].kill()
-                #del sprite.registry[(colB)]
-            
-    """
+
+            #Enemy
+            elif spriteA.sType == "Player" and (spriteB.sType == "EnemyM" or spriteB.sType == "EnemyS"):
+                spriteA.damage()
+
+            elif spriteA.sType == "EnemyM":
+                if spriteB.sType == "Player":
+                    spriteB.damage()
+                
+        if colFlag == 0:
+            player.onGround = False
     else:
-        for n in range(len(sprites)-1):
-            sprites[n+1].colour=black
-    """
-    """
-    for n in range(len(sprite.registry)):
-        if sprite.sType!="Map":
-            sprite[n].vy=sprite[n].vy+9.81*
-            
-    """        #v=u+at
+        player.onGround = False
+    #print(player.onGround)
+
     
+    #gravity--------------------------------------------------
+                    
+    if False == player.onGround:
+        player.vy = player.vy + 1.5*((pygame.time.get_ticks()-player.timeLeave)/1000) # v = u + a*t
+        #print((pygame.time.get_ticks()-player.timeLeave)/1000) #log
+
     
-    #box
-    gameDisplay.fill(white)
-    for n in range(len(sprite.registry)):
-        pygame.draw.rect(gameDisplay,sprite.registry[n].colour,(sprite.registry[n].x,sprite.registry[n].y,sprite.registry[n].size[0],sprite.registry[n].size[1]))
+  
+
+
+    #Display
         
-    clock.tick(60)
-
-    pygame.display.update()
+    camX = player.x - (resolution[0]/2)
+    if player.y > resolution[1]/3:
+        camY = 0
+    else:
+        camY = player.y - (resolution[1]/3)
     
+    gameDisplay.fill(white)
+    #health bar
+    pygame.draw.rect(gameDisplay, black, (21.5*scale,0.4*scale,3*scale,0.6*scale))
+    if player.health != 0:
+        pygame.draw.rect(gameDisplay, red, (21.6*scale,0.5*scale,2.8*scale*player.health/100,0.4*scale))
+    
+    for n in range(len(sprite.registry)):
+        pygame.draw.rect(gameDisplay, sprite.registry[n].colour, (sprite.registry[n].x-camX, sprite.registry[n].y-camY, sprite.registry[n].size[0], sprite.registry[n].size[1]))
 
-end()
+    clock.tick(60)
+    
+    pygame.display.update()
+
+gameEnd(player.x-resolution[0]/3)
