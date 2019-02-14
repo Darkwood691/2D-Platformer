@@ -374,10 +374,6 @@ while gameOver == False:
             elif spriteA.sType == "Player" and (spriteB.sType == "EnemyM" or spriteB.sType == "EnemyS"):
                 spriteA.damage()
 
-            elif spriteA.sType == "EnemyM":
-                if spriteB.sType == "Player":
-                    spriteB.damage()
-
             #Exit
             elif spriteA.sType == "Player" and spriteB.sType == "Exit":
                 gameOver = "Win"
