@@ -20,8 +20,17 @@ monitorResolution = [infoObject.current_w, infoObject.current_h]
 
 gameDisplay = pygame.display.set_mode(resolution,16)
 
+
+global difficulty
 if settings[2] == "1":
     pygame.display.toggle_fullscreen()
+
+if settings[1] == "Easy":
+    difficulty = 15
+elif settings[1] == "Hard":
+    difficulty = 30
+else:
+    difficulty = 20
 
 # pygame.font.init()
 pygame.init()
@@ -90,7 +99,8 @@ class sprite():
         return
 
     def damage(self):
-        damageHP = 20
+        global difficulty
+        damageHP = difficulty
         if self.sType != "Player":
             print("Type Error")
         else:
