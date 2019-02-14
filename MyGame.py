@@ -54,7 +54,7 @@ clock = pygame.time.Clock()
 scale = int(resolution[1] / 14.1)
 speed = scale/5
 jumpHeight = 1.2*speed
-print(speed, jumpHeight, scale)
+#print(speed, jumpHeight, scale)
 global gameOver
 gameOver = False
 
@@ -268,12 +268,12 @@ while gameOver == False:
 
     #Collision Handling
         
-    colisions = spriteColide()
+    collisions = spriteColide()
 
-    if colisions != []:
+    if collisions != []:
         colFlag = 0
-        for n in range(len(colisions)):
-            colision = colisions[n]
+        for n in range(len(collisions)):
+            colision = collisions[n]
             spriteA = sprite.registry[int(colision[0])]
             spriteB = sprite.registry[int(colision[1])]
             
@@ -408,13 +408,16 @@ while gameOver == False:
         camY = player.y - (resolution[1]/3)
     
     gameDisplay.fill(white)
+    
+    
+    for n in range(len(sprite.registry)):
+        pygame.draw.rect(gameDisplay, sprite.registry[n].colour, \
+                         (sprite.registry[n].x-camX, sprite.registry[n].y-camY, sprite.registry[n].size[0], sprite.registry[n].size[1]))
+
     #health bar
     pygame.draw.rect(gameDisplay, black, (21.5*scale,0.4*scale,3*scale,0.6*scale))
     if player.health != 0:
         pygame.draw.rect(gameDisplay, red, (21.6*scale,0.5*scale,2.8*scale*player.health/100,0.4*scale))
-    
-    for n in range(len(sprite.registry)):
-        pygame.draw.rect(gameDisplay, sprite.registry[n].colour, (sprite.registry[n].x-camX, sprite.registry[n].y-camY, sprite.registry[n].size[0], sprite.registry[n].size[1]))
 
     clock.tick(60)
     
