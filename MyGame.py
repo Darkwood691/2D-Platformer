@@ -23,7 +23,8 @@ gameDisplay = pygame.display.set_mode(resolution,16)
 
 global difficulty
 if settings[2] == "1":
-    pygame.display.toggle_fullscreen()
+    pygame.display.toggle_fullscreen()  #only works in a linux enviroment
+    
 
 if settings[1] == "Easy":
     difficulty = 15
@@ -50,10 +51,10 @@ clock = pygame.time.Clock()
 # variables --------------------------------------------------------
 
 #size = [int(resolution[0] / 24.7), int(resolution[1] / 9.36)]
-scale = int(resolution[0] / 24.7)
+scale = int(resolution[1] / 14.1)
 speed = scale/5
-jumpHeight = 1.15*speed
-#print(speed, jumpHeight)
+jumpHeight = 1.2*speed
+print(speed, jumpHeight, scale)
 global gameOver
 gameOver = False
 
@@ -158,10 +159,10 @@ spike3 = sprite(73,13.5,[100,0.6],"EnemyS",red)
 def gameEnd(result,score):
     if result == "Fail":
         print("GAME OVER")
-        print("SCORE: "+str(score))
+        print("SCORE: "+str(round(score)))
     else:
         print("GAME COMPLETE")
-        print("SCORE: "+str(score))
+        print("SCORE: "+str(round(score)))
     time.sleep(0.5)
     end()
 
@@ -384,7 +385,7 @@ while gameOver == False:
         if colFlag == 0:
             player.onGround = False
     else:
-        player.onGround = False
+        player.onGround = False 
     #print(player.onGround)
 
     
@@ -419,4 +420,4 @@ while gameOver == False:
     
     pygame.display.update()
 
-gameEnd(gameOver,player.x-resolution[0]/3)
+gameEnd(gameOver,(player.x-resolution[0]/3)/scale)

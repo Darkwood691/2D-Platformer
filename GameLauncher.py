@@ -3,7 +3,7 @@ from tkinter import *
 try:
     config = open("Settings.txt", "r")
     settings = config.read().split("z")
-    print(settings)
+    #print(settings)
     config.close()
     fail = False
 except:
@@ -23,7 +23,7 @@ class Application(Frame):
         Label(self, text="Resolution:").grid(row=2, column=1)
         Label(self, text="Difficulty:").grid(row=4, column=1)
         Checkbutton(self, text="Fullscreen", variable=fullScreen).grid(row=3, column=2)
-        resolutionMenu = OptionMenu(self, resolutionVar, "640x360", "864x486", "1280x720", "1366x768", "1920x1080")
+        resolutionMenu = OptionMenu(self, resolutionVar, "1280x720", "1366x768", "1920x1080")
         resolutionMenu.grid(row=2, column=2, sticky="nesw")
         OptionMenu(self, difficultyVar, "Easy", "Normal", "Hard").grid(row=4, column=2, sticky="nesw")
         Button(self, text="Done", command=self.exit).grid(row=5, column=2, sticky="nesw")
@@ -35,7 +35,7 @@ class Application(Frame):
         dif = str(difficultyVar.get())
         full = str(fullScreen.get())
         text = res + "z" + dif + "z" + full
-        print(text)
+        #print(text)
         config.write(text)
         config.close()
 
