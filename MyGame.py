@@ -63,8 +63,8 @@ class sprite():
         self.colour = colour
         
         if self.sType == "EnemyM":
-            self.vx = -speed
-            self.vy = speed
+            self.vx = speed
+            self.vy = 0
         else:
             self.vx = 0
             self.vy = 0
@@ -101,7 +101,7 @@ class sprite():
             else:
                 self.health = 0
                 global gameOver
-                gameOver = True
+                gameOver = "Fail"
 
                 
     def kill(self):
@@ -128,13 +128,30 @@ map8 = sprite(30,3, [1,11], "Map", black)
 
 map9 = sprite(35,7.5, [7,1], "Map", black)
 map10 = sprite(35,-10, [1,17.5],"Map",black)
-enemy1 = sprite(35,10, [1,1.6], "EnemyM",red)
+enemy1 = sprite(35,13, [1,1.6], "EnemyM",red)
 map11 = sprite(45,9, [1,5],"Map",black)
 
+map12 = sprite(40,3.5, [7,1],"Map",black)
+spike2 = sprite(45,13.5, [11,0.6],"EnemyS",red)
+map13 = sprite(55, 1,[2,1],"Map",black)
+map14 = sprite(57,1,[1,15],"Map",black)
+map15 = sprite(63,-10,[1,19],"Map",black)
+enemy2 = sprite(58,3,[1,1.6],"EnemyM",red)
 
-def gameEnd(score):
-    print("GAME OVER")
-    print("SCORE: "+str(score))
+map16 = sprite(70,9,[0.5,1],"Map",black)
+map17 = sprite(75,5,[0.5,1],"Map",black)
+map18 = sprite(82,3,[0.5,1],"Map",black)
+map19 = sprite(89,1,[5,1],"Map",black)
+portal = sprite(93,0,[1,1.6],"Exit",green)
+spike3 = sprite(73,13.5,[100,0.6],"EnemyS",red)
+ 
+def gameEnd(result,score):
+    if result == "Fail":
+        print("GAME OVER")
+        print("SCORE: "+str(score))
+    else:
+        print("GAME COMPLETE")
+        print("SCORE: "+str(score))
     time.sleep(0.5)
     end()
 
@@ -349,6 +366,10 @@ while gameOver == False:
             elif spriteA.sType == "EnemyM":
                 if spriteB.sType == "Player":
                     spriteB.damage()
+
+            #Exit
+            elif spriteA.sType == "Player" and spriteB.sType == "Exit":
+                gameOver = "Win"
                 
         if colFlag == 0:
             player.onGround = False
@@ -388,4 +409,4 @@ while gameOver == False:
     
     pygame.display.update()
 
-gameEnd(player.x-resolution[0]/3)
+gameEnd(gameOver,player.x-resolution[0]/3)
