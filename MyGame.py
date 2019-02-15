@@ -18,6 +18,7 @@ infoObject = pygame.display.Info()
 monitorResolution = [infoObject.current_w, infoObject.current_h]
 # print(monitorResolution)
 
+
 gameDisplay = pygame.display.set_mode(resolution,16)
 
 
@@ -50,7 +51,6 @@ clock = pygame.time.Clock()
 
 # variables --------------------------------------------------------
 
-#size = [int(resolution[0] / 24.7), int(resolution[1] / 9.36)]
 scale = int(resolution[1] / 14.1)
 speed = scale/5
 jumpHeight = 1.2*speed
@@ -85,7 +85,7 @@ class sprite():
             self.iTime = 0
                     
     def up(self):
-        if player.onGround == True:
+        if self.onGround == True:
             self.timeLeave = pygame.time.get_ticks()  # current time
             self.vy = - jumpHeight
         self.onGround = False
@@ -137,8 +137,8 @@ map6 = sprite(15,3, [1,8], "Map", black)
 map7 = sprite(25,3, [1,8], "Map", black)
 map8 = sprite(30,3, [1,11], "Map", black)
 
-map9 = sprite(35,7.5, [7,1], "Map", black)
-map10 = sprite(35,-10, [1,17.5],"Map",black)
+map9 = sprite(35.5,7.5, [6.5,1], "Map", black)
+map10 = sprite(35,-10, [1,18.5],"Map",black)
 enemy1 = sprite(35,13, [1,1.6], "EnemyM",red)
 map11 = sprite(45,9, [1,5],"Map",black)
 
@@ -268,12 +268,12 @@ while gameOver == False:
 
     #Collision Handling
         
-    collisions = spriteColide()
+    colisions = spriteColide()
 
-    if collisions != []:
+    if colisions != []:
         colFlag = 0
-        for n in range(len(collisions)):
-            colision = collisions[n]
+        for n in range(len(colisions)):
+            colision = colisions[n]
             spriteA = sprite.registry[int(colision[0])]
             spriteB = sprite.registry[int(colision[1])]
             
@@ -373,6 +373,10 @@ while gameOver == False:
             #Enemy
             elif spriteA.sType == "Player" and (spriteB.sType == "EnemyM" or spriteB.sType == "EnemyS"):
                 spriteA.damage()
+
+            elif spriteA.sType == "EnemyM":
+                if spriteB.sType == "Player":
+                    spriteB.damage()
 
             #Exit
             elif spriteA.sType == "Player" and spriteB.sType == "Exit":
