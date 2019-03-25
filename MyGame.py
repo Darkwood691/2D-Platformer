@@ -173,7 +173,7 @@ def end():
 
 
 # collision detection --------------------------------------------------------
-def spriteColide():
+def spriteCollide():
     cols = []
     for n in range(len(sprite.registry)):
         for m in range(len(sprite.registry)):
@@ -268,14 +268,14 @@ while gameOver == False:
 
     #Collision Handling
         
-    colisions = spriteColide()
+    collisions = spriteCollide()
 
-    if colisions != []:
+    if collisions != []:
         colFlag = 0
-        for n in range(len(colisions)):
-            colision = colisions[n]
-            spriteA = sprite.registry[int(colision[0])]
-            spriteB = sprite.registry[int(colision[1])]
+        for n in range(len(collisions)):
+            collision = collisions[n]
+            spriteA = sprite.registry[int(collision[0])]
+            spriteB = sprite.registry[int(collision[1])]
             
             if spriteB.sType == "Map" and spriteA.sType != "Map":
                 if spriteA.sType == "Player":
