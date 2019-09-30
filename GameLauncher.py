@@ -3,11 +3,12 @@ from tkinter import *
 try:
     config = open("Settings.txt", "r")
     settings = config.read().split("z")
-    #print(settings)
+    # print(settings)
     config.close()
     fail = False
 except:
     fail = True
+
 
 class Application(Frame):
 
@@ -35,12 +36,13 @@ class Application(Frame):
         dif = str(difficultyVar.get())
         full = str(fullScreen.get())
         text = res + "z" + dif + "z" + full
-        #print(text)
+        # print(text)
         config.write(text)
         config.close()
 
         root.destroy()
         import MyGame
+
 
 root = Tk()
 fullScreen = IntVar()
@@ -60,4 +62,3 @@ root.title("Game Launcher")
 root.minsize(280, 180)
 app = Application(root)
 root.mainloop()
-
